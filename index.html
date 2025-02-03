@@ -1,133 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VPSIndonesia - CF Non Protect</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBX-Layer7Stat - VPSIndonesia - CF Non Protect</title>
     <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        background-color: #1e1e2f;
-        color: #ffffff;
-      }
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background-color: #121212;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
-      body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-      }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
 
-      body > div {
-        width: 100%;
-      }
+        body > div {
+            width: 100%;
+        }
 
-      #chart {
-        width: 80%;
-        margin: auto;
-      }
+        #chart {
+            width: 80%;
+            margin: auto;
+        }
 
-      #info {
-        margin-top: 2em;
-        text-align: center;
-        font-family: Arial, Helvetica, sans-serif;
-      }
+        #info {
+            margin-top: 2em;
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
-      a {
-        color: #9f7aea;
-      }
+        .data {
+            margin-top: 20px;
+        }
+
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
-  </head>
-  <body>
-    <div>
-      <center>
-        <h1>VPSIndonesia - CF Non Protect</h1>
-        <p>This page shows the latest Cloudflare traffic data for your website.</p>
-        <h2 id="info">Capturing requests from <a href="https://cfx.vpsindo.host">https://cfx.vpsindo.host</a></h2>
-      </center>
-      <div id="chart"></div>
-      <center>
-        <div id="traffic-data" class="data">
-          <p>Loading traffic data...</p>
-        </div>
-      </center>
+</head>
+<body>
+    <center><h2 id="info"></h2></center>
+
+    <!-- Live Traffic Chart -->
+    <div id="chart"></div>
+
+    <center>
+    <div id="traffic-data" class="data">
+        <p>Loading traffic data...</p>
     </div>
+    </center>
 
     <script>
-      // Replace with your API URL
-      const apiUrl = 'https://script.google.com/macros/s/AKfycbzaJtA7W8VyM4Jo-3b_atczZHAG59tqXv8pDqh9_lY2TyDTAq5Bj0nUuPD8ZMiVYHZD/exec';
+        window.onload = () => {
+            let info = document.getElementById("info");
 
-      // Initialize the chart
-      let chart = Highcharts.chart('chart', {
-  credits: { enabled: false }, // Hide watermark
-  exporting: { enabled: false },
-  chart: {
-    type: 'area',
-    zoomType: 'x',
-    backgroundColor: '#1e1e2f',
-    events: {
-      load: function () {
-        let series = this.series[0];
-        setInterval(function () {
-          fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-              const totalRequests = data.total_requests || 0;
-              const x = (new Date()).getTime(); // Current time
-              const y = totalRequests; // Latest traffic data
+            // Initialize chart with purple color scheme and no watermark
+            let chart = Highcharts.chart('chart', {
+                chart: {
+                    type: 'area',
+                    zoomType: 'x',
+                    backgroundColor: '#121212', // Dark background for chart
+                    events: {
+                        load: function () {
+                            let series = this.series[0];
+                            setInterval(function () {
+                                fetch('https://script.google.com/macros/s/AKfycbzaJtA7W8VyM4Jo-3b_atczZHAG59tqXv8pDqh9_lY2TyDTAq5Bj0nUuPD8ZMiVYHZD/exec')
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        // Update total requests data
+                                        const totalRequests = data.total_requests || 0;
 
-              series.addPoint([x, y], true, series.data.length > 40);
-            })
-            .catch(error => {
-              console.error('Error fetching data:', error);
+                                        // Update the chart data dynamically
+                                        const x = (new Date()).getTime(); // Current time
+                                        const y = totalRequests; // Latest traffic data
+
+                                        series.addPoint([x, y], true, series.data.length > 40);
+                                    })
+                                    .catch(error => {
+                                        console.error('Error fetching data:', error);
+                                    });
+                            }, 1000); // Update every 1 second
+                        }
+                    }
+                },
+                title: {
+                    text: 'Live Request From https://cfx.vpsindo.host<br><br>Layer7 (CFX Berlin DC)',
+                    style: {
+                        color: '#ffffff'
+                    }
+                },
+                xAxis: {
+                    type: 'datetime',
+                    title: {
+                        text: 'Time',
+                        style: {
+                            color: '#ffffff'
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: '#ffffff'
+                        }
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'Requests',
+                        style: {
+                            color: '#ffffff'
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: '#ffffff'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Total Requests',
+                    data: [],
+                    color: '#9b59b6', // Purple color for the graph line
+                    fillColor: 'rgba(155, 89, 182, 0.3)' // Transparent purple fill color
+                }],
+                credits: {
+                    enabled: false // Remove Highcharts watermark
+                }
             });
-        }, 1000); // Update every 1 second
-      }
-    }
-  },
-  title: {
-    text: 'DE | High Availability Servers',
-    style: { color: '#ffffff' }
-  },
-  xAxis: {
-    type: 'datetime',
-    title: { text: 'Time', style: { color: '#ffffff' } },
-    labels: { style: { color: '#ffffff' } }
-  },
-  yAxis: {
-    title: { text: 'Requests', style: { color: '#ffffff' } },
-    labels: { style: { color: '#ffffff' } }
-  },
-  series: [{
-    name: 'Total Requests',
-    data: [],
-    color: '#9f7aea'
-  }],
-  legend: { itemStyle: { color: '#ffffff' } }
-});
 
-      // Fetch the initial traffic data
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          const trafficDiv = document.getElementById('traffic-data');
-          if (data.total_requests === 0) {
-            trafficDiv.innerHTML = '<p>No data available.</p>';
-            return;
-          }
+            // Fetch the initial traffic data
+            fetch('https://script.google.com/macros/s/AKfycbzaJtA7W8VyM4Jo-3b_atczZHAG59tqXv8pDqh9_lY2TyDTAq5Bj0nUuPD8ZMiVYHZD/exec')
+                .then(response => response.json())
+                .then(data => {
+                    const trafficDiv = document.getElementById('traffic-data');
+                    if (data.total_requests === 0) {
+                        trafficDiv.innerHTML = '<p>No data available.</p>';
+                        return;
+                    }
 
-          // Display total requests
-          let html = `<h3>Total Requests in Last Hour: ${data.total_requests}</h3>`;
+                    // Display total requests
+                    let html = `<h3>Total Requests in Last Hour: ${data.total_requests}</h3>`;
 
-          trafficDiv.innerHTML = html;
-        })
-        .catch(error => {
-          console.error('Error fetching data:', error);
-          document.getElementById('traffic-data').innerHTML = '<p>Error loading data.</p>';
-        });
+                    trafficDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('traffic-data').innerHTML = '<p>Error loading data.</p>';
+                });
+        };
     </script>
-  </body>
+    <script src="cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="76be119b045a3ad0319e6185-|49" defer></script>
+    <script>
+        (function(){
+            function c(){
+                var b=a.contentDocument||a.contentWindow.document;
+                if(b){
+                    var d=b.createElement('script');
+                    d.innerHTML="window.__CF$cv$params={r:'90bfa0e87e2af7bb',t:'MTczODU1NjQyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+                    b.getElementsByTagName('head')[0].appendChild(d)
+                }
+            }
+            if(document.body){
+                var a=document.createElement('iframe');
+                a.height=1;
+                a.width=1;
+                a.style.position='absolute';
+                a.style.top=0;
+                a.style.left=0;
+                a.style.border='none';
+                a.style.visibility='hidden';
+                document.body.appendChild(a);
+                if('loading'!==document.readyState)c();
+                else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);
+                else{
+                    var e=document.onreadystatechange||function(){};
+                    document.onreadystatechange=function(b){
+                        e(b);
+                        'loading'!==document.readyState&&(document.onreadystatechange=e,c())
+                    }
+                }
+            }
+        })();
+    </script>
+</body>
 </html>

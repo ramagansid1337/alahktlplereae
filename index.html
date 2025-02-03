@@ -7,44 +7,44 @@
     <style>
         html,
         body {
-            height: 100%;
-            margin: 0;
-            background-color: #121212;
-            color: white;
-            font-family: Arial, Helvetica, sans-serif;
+          height: 100%;
+          margin: 0;
+          background-color: #121212; /* Dark Mode Background */
+          color: white;
+          font-family: Arial, Helvetica, sans-serif;
         }
 
         body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
         }
 
         body > div {
-            width: 100%;
+          width: 100%;
         }
 
         #chart {
-            width: 80%;
-            margin: auto;
+          width: 80%;
+          margin: auto;
         }
 
         #info {
-            margin-top: 2em;
-            text-align: center;
-            font-family: Arial, Helvetica, sans-serif;
+          margin-top: 2em;
+          text-align: center;
+          font-size: 24px;
         }
 
         .data {
-            margin-top: 20px;
+          margin-top: 20px;
+          text-align: center;
         }
-
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
 </head>
 <body>
-    <center><h2 id="info"></h2></center>
+    <center><h2 id="info">Live Traffic Data</h2></center>
 
     <!-- Live Traffic Chart -->
     <div id="chart"></div>
@@ -59,27 +59,37 @@
         window.onload = () => {
             let info = document.getElementById("info");
 
-            // Initialize chart with purple color scheme and no watermark
+            // Initialize chart
             let chart = Highcharts.chart('chart', {
                 chart: {
                     type: 'area',
                     zoomType: 'x',
-                    backgroundColor: '#121212', // Dark background for chart
                     events: {
                         load: function () {
                             let series = this.series[0];
                             setInterval(function () {
-                                fetch('https://script.google.com/macros/s/AKfycbyAIKpxVKDgYiWm-A1sXPpqHYdc7SbF1cz2NaOytX331YlCOOxzYqt-9n2IBGk1NHip/exec')
+                                // Fetch data from the new Google Apps Script API
+                                fetch('https://script.google.com/macros/s/AKfycbyPlPHIItPHuSoiWFkh3vZO3AUpcTjGBKycoHPZ7PQDXumybosBk9xym9OYT-VXah3icQ/exec')
                                     .then(response => response.json())
                                     .then(data => {
                                         // Update total requests data
                                         const totalRequests = data.total_requests || 0;
+                                        const statusCodes = data.status_code_requests || {};
 
                                         // Update the chart data dynamically
                                         const x = (new Date()).getTime(); // Current time
                                         const y = totalRequests; // Latest traffic data
 
+                                        // Update chart with the new data point
                                         series.addPoint([x, y], true, series.data.length > 40);
+
+                                        // Display traffic data on the page
+                                        const trafficDiv = document.getElementById('traffic-data');
+                                        let html = `<h3>Total Requests: ${totalRequests}</h3>`;
+                                        for (let status in statusCodes) {
+                                            html += `<p>Status ${status}: ${statusCodes[status]}</p>`;
+                                        }
+                                        trafficDiv.innerHTML = html;
                                     })
                                     .catch(error => {
                                         console.error('Error fetching data:', error);
@@ -89,51 +99,27 @@
                     }
                 },
                 title: {
-                    text: 'Live Request From https://cfx.vpsindo.host<br><br>Layer7 (CFX Berlin DC)',
-                    style: {
-                        color: '#ffffff'
-                    }
+                    text: 'Live Request From https://cfx.vpsindo.host<br><br>Layer7 (CFX Berlin DC)'
                 },
                 xAxis: {
                     type: 'datetime',
                     title: {
-                        text: 'Time',
-                        style: {
-                            color: '#ffffff'
-                        }
-                    },
-                    labels: {
-                        style: {
-                            color: '#ffffff'
-                        }
+                        text: 'Time'
                     }
                 },
                 yAxis: {
                     title: {
-                        text: 'Requests',
-                        style: {
-                            color: '#ffffff'
-                        }
-                    },
-                    labels: {
-                        style: {
-                            color: '#ffffff'
-                        }
+                        text: 'Requests'
                     }
                 },
                 series: [{
                     name: 'Total Requests',
-                    data: [],
-                    color: '#9b59b6', // Purple color for the graph line
-                    fillColor: 'rgba(155, 89, 182, 0.3)' // Transparent purple fill color
-                }],
-                credits: {
-                    enabled: false // Remove Highcharts watermark
-                }
+                    data: []
+                }]
             });
 
-            // Fetch the initial traffic data
-            fetch('https://script.google.com/macros/s/AKfycbyAIKpxVKDgYiWm-A1sXPpqHYdc7SbF1cz2NaOytX331YlCOOxzYqt-9n2IBGk1NHip/exec')
+            // Fetch initial traffic data and display it
+            fetch('https://script.google.com/macros/s/AKfycbyPlPHIItPHuSoiWFkh3vZO3AUpcTjGBKycoHPZ7PQDXumybosBk9xym9OYT-VXah3icQ/exec')
                 .then(response => response.json())
                 .then(data => {
                     const trafficDiv = document.getElementById('traffic-data');
@@ -142,8 +128,11 @@
                         return;
                     }
 
-                    // Display total requests
+                    // Display total requests and status codes
                     let html = `<h3>Total Requests in Last Hour: ${data.total_requests}</h3>`;
+                    for (let status in data.status_code_requests) {
+                        html += `<p>Status ${status}: ${data.status_code_requests[status]}</p>`;
+                    }
 
                     trafficDiv.innerHTML = html;
                 })
@@ -152,39 +141,6 @@
                     document.getElementById('traffic-data').innerHTML = '<p>Error loading data.</p>';
                 });
         };
-    </script>
-    <script src="cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="76be119b045a3ad0319e6185-|49" defer></script>
-    <script>
-        (function(){
-            function c(){
-                var b=a.contentDocument||a.contentWindow.document;
-                if(b){
-                    var d=b.createElement('script');
-                    d.innerHTML="window.__CF$cv$params={r:'90bfa0e87e2af7bb',t:'MTczODU1NjQyNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
-                    b.getElementsByTagName('head')[0].appendChild(d)
-                }
-            }
-            if(document.body){
-                var a=document.createElement('iframe');
-                a.height=1;
-                a.width=1;
-                a.style.position='absolute';
-                a.style.top=0;
-                a.style.left=0;
-                a.style.border='none';
-                a.style.visibility='hidden';
-                document.body.appendChild(a);
-                if('loading'!==document.readyState)c();
-                else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);
-                else{
-                    var e=document.onreadystatechange||function(){};
-                    document.onreadystatechange=function(b){
-                        e(b);
-                        'loading'!==document.readyState&&(document.onreadystatechange=e,c())
-                    }
-                }
-            }
-        })();
     </script>
 </body>
 </html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error 404</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      text-align: center;
+      margin-top: 50px;
+    }
+    table {
+      background-color: #FEEE7A;
+      margin: 0 auto;
+      width: 400px;
+      border: 1px solid #ddd;
+    }
+    td {
+      padding: 10px;
+    }
+    .error-header {
+      background-color: #FBFFDF;
+      font-weight: bold;
+    }
+    .error-body {
+      background-color: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+  <h2>Error 404</h2>
+  <table>
+    <tr>
+      <td>
+        <table width="100%">
+          <tr class="error-header">
+            <td>Error 404</td>
+          </tr>
+          <tr class="error-body">
+            <td>
+              This page can't be displayed. Contact support for additional information.
+              <br />
+              Incident ID: <span id="incident-id">[Generated Incident ID]</span>
+              <br />
+              Requested Host: <span id="requested-host">[Host Name]</span>
+              <br />
+              Event ID: <span id="event-id">[Timestamp]</span>
+              <br />
+              Client IP: <span id="client-ip">[Client IP]</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <script>
+    // Mock data for static HTML version
+    function generateIncidentID() {
+      return 'INC-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+    }
+
+    function generateEventID() {
+      return Math.floor(Date.now() / 1000);
+    }
+
+    function getClientIP() {
+      return '127.0.0.1'; // Placeholder for demonstration
+    }
+
+    // Populate placeholders
+    document.getElementById('incident-id').textContent = generateIncidentID();
+    document.getElementById('requested-host').textContent = window.location.hostname;
+    document.getElementById('event-id').textContent = generateEventID();
+    document.getElementById('client-ip').textContent = getClientIP();
+  </script>
+</body>
+</html>

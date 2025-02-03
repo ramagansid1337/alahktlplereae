@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VPSIndonesia - CF Non Protect</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background-color: #1e1e2f;
+        color: #ffffff;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      body > div {
+        width: 100%;
+      }
+
+      #chart {
+        width: 80%;
+        margin: auto;
+      }
+
+      #info {
+        margin-top: 2em;
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      a {
+        color: #9f7aea;
+      }
+    </style>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+  </head>
+  <body>
+    <div>
+      <center>
+        <h1>VPSIndonesia - CF Non Protect</h1>
+        <p>This page shows the latest Cloudflare traffic data for your website.</p>
+        <h2 id="info">Capturing requests from <a href="https://cfx.vpsindo.host">https://cfx.vpsindo.host</a></h2>
+      </center>
+      <div id="chart"></div>
+      <center>
+        <div id="traffic-data" class="data">
+          <p>Loading traffic data...</p>
+        </div>
+      </center>
+    </div>
+
+    <script>
+      // Replace with your API URL
+      const apiUrl = 'https://script.google.com/macros/s/AKfycbzaJtA7W8VyM4Jo-3b_atczZHAG59tqXv8pDqh9_lY2TyDTAq5Bj0nUuPD8ZMiVYHZD/exec';
+
+      // Initialize the chart
+      let chart = Highcharts.chart('chart', {
+  credits: { enabled: false }, // Hide watermark
+  exporting: { enabled: false },
+  chart: {
+    type: 'area',
+    zoomType: 'x',
+    backgroundColor: '#1e1e2f',
+    events: {
+      load: function () {
+        let series = this.series[0];
+        setInterval(function () {
+          fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+              const totalRequests = data.total_requests || 0;
+              const x = (new Date()).getTime(); // Current time
+              const y = totalRequests; // Latest traffic data
+
+              series.addPoint([x, y], true, series.data.length > 40);
+            })
+            .catch(error => {
+              console.error('Error fetching data:', error);
+            });
+        }, 1000); // Update every 1 second
+      }
+    }
+  },
+  title: {
+    text: 'Live Cloudflare Traffic Requests',
+    style: { color: '#ffffff' }
+  },
+  xAxis: {
+    type: 'datetime',
+    title: { text: 'Time', style: { color: '#ffffff' } },
+    labels: { style: { color: '#ffffff' } }
+  },
+  yAxis: {
+    title: { text: 'Requests', style: { color: '#ffffff' } },
+    labels: { style: { color: '#ffffff' } }
+  },
+  series: [{
+    name: 'Total Requests',
+    data: [],
+    color: '#9f7aea'
+  }],
+  legend: { itemStyle: { color: '#ffffff' } }
+});
+
+      // Fetch the initial traffic data
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const trafficDiv = document.getElementById('traffic-data');
+          if (data.total_requests === 0) {
+            trafficDiv.innerHTML = '<p>No data available.</p>';
+            return;
+          }
+
+          // Display total requests
+          let html = `<h3>Total Requests in Last Hour: ${data.total_requests}</h3>`;
+
+          trafficDiv.innerHTML = html;
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+          document.getElementById('traffic-data').innerHTML = '<p>Error loading data.</p>';
+        });
+    </script>
+  </body>
+</html>

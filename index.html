@@ -68,7 +68,7 @@
                         load: function () {
                             let series = this.series[0];
                             setInterval(function () {
-                                // Fetch data from the new Google Apps Script API
+                                // Fetch data from Google Apps Script API
                                 fetch('https://script.google.com/macros/s/AKfycbyPlPHIItPHuSoiWFkh3vZO3BRwQUYcIbXyc2KFPMactqJLNnlLAQcMvzOYT-VXah3icQ/exec')
                                     .then(response => response.json())
                                     .then(data => {

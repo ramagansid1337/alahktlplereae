@@ -69,7 +69,7 @@
                         load: function () {
                             let series = this.series[0];
                             setInterval(function () {
-                                fetch('https://script.google.com/macros/s/AKfycbzaJtA7W8VyM4Jo-3b_atczZHAG59tqXv8pDqh9_lY2TyDTAq5Bj0nUuPD8ZMiVYHZD/exec')
+                                fetch('https://script.google.com/macros/s/AKfycbyAIKpxVKDgYiWm-A1sXPpqHYdc7SbF1cz2NaOytX331YlCOOxzYqt-9n2IBGk1NHip/exec')
                                     .then(response => response.json())
                                     .then(data => {
                                         // Update total requests data
@@ -133,7 +133,7 @@
             });
 
             // Fetch the initial traffic data
-            fetch('https://script.google.com/macros/s/AKfycbzaJtA7W8VyM4Jo-3b_atczZHAG59tqXv8pDqh9_lY2TyDTAq5Bj0nUuPD8ZMiVYHZD/exec')
+            fetch('https://script.google.com/macros/s/AKfycbyAIKpxVKDgYiWm-A1sXPpqHYdc7SbF1cz2NaOytX331YlCOOxzYqt-9n2IBGk1NHip/exec')
                 .then(response => response.json())
                 .then(data => {
                     const trafficDiv = document.getElementById('traffic-data');
